@@ -2,29 +2,18 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import './index.css';
 
-// Since the Square components no longer maintain state, the Square components receive values from the Board component and inform the Board component
-// when they’re clicked.In React terms, the Square components are now controlled components. 
-class Square extends React.Component {
-    render() {
-        return (
-            <button
-                className="square"
-                // When a Square is clicked, the onClick function provided by the Board is called
-                // - The onClick prop on the built-in DOM <button> component tells React to set up a click event listener.
-                // - When the button is clicked, React will call the onClick event handler that is defined in Square’s render() method
-                // - This event handler calls this.props.onClick(). The Square’s onClick prop was specified by the Board.
-                // - Since the Board passed onClick={() => this.handleClick(i)} to Square, the Square calls this.handleClick(i) when clicked.
-                onClick={() => this.props.onClick()}
-            >
-                {this.props.value}
-            </button>
-        );
-    }
+// function components are a simpler way to write components that only contain a render method and don’t have their 
+// own state.Instead of defining a class which extends React.Component, we can write a function that takes props as 
+// input and returns what should be rendered.Function components are less tedious to write than classes, and many 
+// components can be expressed this way.
+function Square(props) {
+    return (
+        <button className="square" onClick={props.onClick}>
+            {props.value}
+        </button>
+    );
 }
 
-// state of each square is now stored in the Board instead of the individual Square components.
-// When the Board’s state changes, the Square components re-render automatically. 
-// Keeping the state of all squares in the Board component will allow it to determine the winner in the future.
 class Board extends React.Component {
     constructor(props) {
         super(props);

@@ -2,27 +2,19 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import './index.css';
 
+// Since the Square components no longer maintain state, the Square components receive values from the Board component and inform the Board component
+// when they’re clicked.In React terms, the Square components are now controlled components. 
 class Square extends React.Component {
-    // To "remember things, components use state. This.state is considered as private to a React
-    // component. In JS classes, you need to always call super when defining the constructor of a subclass.
-    // All React component classes that have a constructor should start it with a super(props) call.
-    constructor(props) {
-        super(props);
-        this.state = {
-            value: null,
-        }
-    }
-
     render() {
         return (
             <button
                 className="square"
-                //By calling this.setState from an onClick handler in the Square’s render method, 
-                // we tell React to re-render that Square whenever its <button> is clicked. 
-                // After the update, the Square’ s this.state.value will be 'X'
-                // When you call setState in a component, React automatically updates the child 
-                // components inside of it too.
-                onClick={() => this.setState({ value: 'X' })}
+                // When a Square is clicked, the onClick function provided by the Board is called
+                // - The onClick prop on the built-in DOM <button> component tells React to set up a click event listener.
+                // - When the button is clicked, React will call the onClick event handler that is defined in Square’s render() method
+                // - This event handler calls this.props.onClick(). The Square’s onClick prop was specified by the Board.
+                // - Since the Board passed onClick={() => this.handleClick(i)} to Square, the Square calls this.handleClick(i) when clicked.
+                onClick={() => this.props.onClick()}
             >
                 {this.props.value}
             </button>
@@ -30,9 +22,37 @@ class Square extends React.Component {
     }
 }
 
+// state of each square is now stored in the Board instead of the individual Square components.
+// When the Board’s state changes, the Square components re-render automatically. 
+// Keeping the state of all squares in the Board component will allow it to determine the winner in the future.
 class Board extends React.Component {
+    constructor(props) {
+        super(props);
+        this.state = {
+            squares: Array(9).fill(null),
+        };
+    }
+
+    handleClick(i) {
+        /* slice creates a copy of the sqaure array to modify instead of modifying the existing array.
+           Immutability:
+           - mutate data: directly change the data values
+           - or replace data with new copy with the desired changes like below
+              - helps detect previous changes
+            - when to re-render a component
+        */
+                const squares = this.state.squares.slice();
+        squares[i] = 'X';
+        this.setState({ squares: squares });
+    }
+
     renderSquare(i) {
-        return <Square value={i} />;
+        return (
+          <Square
+            value={this.state.squares[i]}
+            onClick={() => this.handleClick(i)}
+          />
+        ); 
     }
 
     render() {
